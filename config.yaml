@@ -33,6 +33,12 @@ training:
     n_filters: 4              # Number of filters on first UNet layer
     flip: true                # Randomly flip tomograms along X/Y axis
     rotate: true              # Randomly rotate tomograms in 90-degree increments
+    data_augmentation:
+      active: true
+      gaussian_sigma: 2.5
+      gaussian_epsilon: 0.2
+      salt_pepper_p: 0.02
+      salt_pepper_maxamp: 0.8
   evaluation:
     active: true
     cv_folds: 5               # Cross validation folds (>=2)
