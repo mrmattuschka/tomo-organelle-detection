@@ -13,6 +13,8 @@ from keras.optimizers import Adam
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 
+from DataAugmentation import *
+
 
 def conv2d_block(input_tensor, n_filters, kernel_size=3):
     # first layer
@@ -26,9 +28,24 @@ def conv2d_block(input_tensor, n_filters, kernel_size=3):
     return x
 
 
-def get_unet(input_img, n_filters, target_shape):
+def get_unet(input_img, n_filters, target_shape, dataaug_config=None):
+
+    # data augmentation if active
+    if dataaug_config:
+        da1 = AdditiveGaussianNoise(
+            sigma=dataaug_config["gaussian_sigma"],
+            epsilon=dataaug_config["gaussian_epsilon"]
+        ) (input_img)
+        da2 = AdditiveSPNoise(
+            p=dataaug_config["salt_pepper_p"],
+            max_amp=dataaug_config["salt_pepper_maxamp"]
+        ) (da1)
+        i0 = da2
+    else:
+        i0 = input_img
+
     # contracting path
-    c1 = conv2d_block(input_img, n_filters=n_filters*4, kernel_size=3) #The first block of U-net
+    c1 = conv2d_block(i0, n_filters=n_filters*4, kernel_size=3) #The first block of U-net
     p1 = MaxPooling2D((2, 2)) (c1)
 
     c2 = conv2d_block(p1, n_filters=n_filters*8, kernel_size=3)

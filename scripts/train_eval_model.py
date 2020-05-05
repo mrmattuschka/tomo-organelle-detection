@@ -124,19 +124,19 @@ def main():
         
         if config["data_augmentation"]["active"]:
             # Include data augmentation if activated
-            gauss_noise = AdditiveGaussianNoise(
-                sigma=config["data_augmentation"]["gaussian_sigma"],
-                epsilon=config["data_augmentation"]["gaussian_epsilon"]
-            ) (input_img)
-            sp_noise = AdditiveSPNoise(
-                p=config["data_augmentation"]["salt_pepper_p"],
-                max_amp=config["data_augmentation"]["salt_pepper_maxamp"]
-            ) (gauss_noise)
-        
-            model = get_unet(sp_noise, n_filters=config["n_filters"], target_shape=train_labels.shape)
+            model = get_unet(
+                input_img,
+                n_filters=config["n_filters"],
+                target_shape=train_labels.shape,
+                dataaug_config=config["data_augmentation"]
+            )
         else:
             # Otherwise create model rightaway
-            model = get_unet(input_img, n_filters=config["n_filters"], target_shape=train_labels.shape)
+            model = get_unet(
+                input_img, 
+                n_filters=config["n_filters"], 
+                target_shape=train_labels.shape
+            )
         
         model.compile(
             optimizer=Adam(learning_rate=config["lr"]),
