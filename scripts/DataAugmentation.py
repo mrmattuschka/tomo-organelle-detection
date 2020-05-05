@@ -15,7 +15,7 @@ class AdditiveSPNoise(Layer):
             salt   = K.random_binomial(shape=shp, p=self.p)
             pepper = K.random_binomial(shape=shp, p=self.p)
             amp    = K.random_uniform(shape=shp[0:1], minval=0, maxval=self.max_amp)
-            amp    = K.reshape(amp, [shp[0], 1, 1])
+            amp    = K.reshape(amp, [shp[0], 1, 1, 1])
             
             out = inputs + amp * (salt - pepper)
             return out
@@ -35,7 +35,7 @@ class AdditiveGaussianNoise(Layer):
             shp    = K.shape(inputs)       
             noise  = K.random_normal(shape=shp, stddev=self.sigma)
             amp    = K.random_uniform(shape=shp[0:1], minval=0, maxval=self.epsilon)
-            amp    = K.reshape(amp, [shp[0], 1, 1])
+            amp    = K.reshape(amp, [shp[0], 1, 1, 1])
             
             out = inputs + amp * noise
             return out
