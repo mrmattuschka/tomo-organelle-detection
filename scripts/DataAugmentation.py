@@ -1,6 +1,8 @@
+import numpy as np
+
 from keras import backend as K
 from keras.layers import Layer
-
+from keras.preprocessing.image import ImageDataGenerator
 
 class AdditiveSPNoise(Layer):
 
@@ -41,3 +43,24 @@ class AdditiveGaussianNoise(Layer):
             return out
 
         return K.in_train_phase(noised(), inputs, training=training)
+
+
+class IDGWithLabels():
+    def __init__(self, flip=True, rot90=True, **kwargs):
+        self.generator = ImageDataGenerator(**kwargs)
+        self.flip = flip
+        self.rot90 = rot90
+    
+    def flow(self, *args, **kwargs):
+        for X, y in self.generator.flow(*args, **kwargs):
+            if self.flip:
+                k = np.random.binomial(1, 0.5, size=2) * 2 - 1
+                X = X[:, ::k[0], ::k[1]]
+                y = y[:, ::k[0], ::k[1]]
+                
+            if self.rot90:
+                k = np.random.randint(4)
+                X = np.rot90(X, k, (1, 2))
+                y = np.rot90(y, k, (1, 2))
+
+            yield X, y
