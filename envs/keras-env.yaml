@@ -18,6 +18,7 @@ dependencies:
   - snakemake=5.3.0=py36_1
   - snakemake-minimal=5.3.0=py36_1
   - yaml=0.2.2=h516909a_1
+  - pillow=7.0.0=py36hb39fc2d_0
   - pip:
     - h5py==2.10.0
     - keras==2.3.1
