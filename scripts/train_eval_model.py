@@ -18,6 +18,10 @@ from ConfigUtil import assemble_config
 from UNet import *
 from DataAugmentation import *
 
+import tensorflow as tf
+import keras.backend as K
+import scipy.misc
+
 
 
 def main():
@@ -169,12 +173,47 @@ def main():
                 train_labels,
                 batch_size=config["batch_size"]
             ),
-            epochs=config["epochs"],
+            epochs= 2, #config["epochs"],
             steps_per_epoch=len(train_features) / config["batch_size"],
             callbacks=callbacks,
             validation_data=(test_features, test_labels),
             verbose=2
         )
+
+        flow = generator.flow(
+            train_features, 
+            train_labels,
+            batch_size=config["batch_size"]
+        )
+
+        summary_feats, summary_labels = flow.__next__()
+
+        print(model.layers)
+
+        inp = model.input
+        output = model.layers[2].output
+        functor = K.function([inp, K.learning_phase()], output)
+
+        aug_feats = functor([summary_feats, 1])
+
+        imloc = f"{config['tf_logdir']}/{RUN_NAME}_CV-{cv_idx}"
+
+        for idx, (aug_feat, lab) in enumerate(zip(aug_feats, summary_labels)):
+
+            aug_feat -= aug_feat.mean()
+            aug_feat /= aug_feat.std()
+            aug_feat *= 12.8
+            aug_feat += 127
+            aug_feat = np.clip(aug_feat, 0, 255)
+            aug_feat = aug_feat.astype(np.int8)
+
+            im_out = Image.fromarray(aug_feat[...,0], "L")
+            im_out.save(f"{imloc}/{idx}_feats.jpg")
+
+            lab = lab*255
+            lab = lab.astype(np.int8)
+            im_out = Image.fromarray(lab[...,0], "L")
+            im_out.save(f"{imloc}/{idx}_labels.jpg")
 
         results.history["cv_fold"] = cv_idx
         results.history["train_ids"] = ",".join(train_ids)
