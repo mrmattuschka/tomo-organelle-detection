@@ -194,4 +194,7 @@ class IDGWithLabels():
                 )
                 X, y = np.moveaxis(batch, 1, 0)
 
-            yield X[..., None], y[..., None]
+            if self.distort:
+                yield X[..., None], y[..., None]
+            else:
+                yield X, y
