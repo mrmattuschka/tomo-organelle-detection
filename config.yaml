@@ -39,6 +39,9 @@ training:
       gaussian_epsilon: 0.2
       salt_pepper_p: 0.02
       salt_pepper_maxamp: 0.8
+      distort: true
+      distort_grid_size: [5, 5]
+      distort_magnitude: 5
   evaluation:
     active: true
     cv_folds: 5               # Cross validation folds (>=2)

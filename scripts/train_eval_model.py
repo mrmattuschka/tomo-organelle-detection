@@ -161,9 +161,9 @@ def main():
         generator = IDGWithLabels(
             flip=config["flip"], 
             rot90=config["rotate"],
-            distort=True,
-            distort_max_grid_size=(5, 5),
-            distort_max_magnitude=10
+            distort=config["data_augmentation"]["distort"],
+            distort_max_grid_size=config["data_augmentation"]["distort_grid_size"],
+            distort_max_magnitude=config["data_augmentation"]["distort_magnitude"]
         )
 
         # Fitting the model 
